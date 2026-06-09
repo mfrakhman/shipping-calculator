@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.Response;
 import org.acme.auth.entity.User;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -38,7 +39,12 @@ public class OAuthService {
     @Inject
     ObjectMapper objectMapper;
 
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private HttpClient httpClient;
+
+    @PostConstruct
+    void init() {
+        this.httpClient = HttpClient.newHttpClient();
+    }
 
     public String getAuthorizationUrl() {
         return "https://accounts.google.com/o/oauth2/v2/auth" +

@@ -1,5 +1,6 @@
 package org.acme.auth.controller;
 
+import io.smallrye.common.annotation.Blocking;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -9,6 +10,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.net.URI;
 
+@Blocking
 @Path("/api/auth/oauth")
 @Produces(MediaType.APPLICATION_JSON)
 public class OAuthController {

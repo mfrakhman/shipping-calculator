@@ -1,5 +1,6 @@
 package org.acme.auth.controller;
 
+import io.smallrye.common.annotation.Blocking;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -10,6 +11,7 @@ import org.acme.auth.entity.User;
 import org.acme.auth.service.AuthService;
 import org.acme.common.response.ApiResponse;
 
+@Blocking
 @Path("/api/auth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
