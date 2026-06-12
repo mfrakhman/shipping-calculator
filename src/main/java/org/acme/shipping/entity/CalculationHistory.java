@@ -29,11 +29,17 @@ public class CalculationHistory extends PanacheEntityBase {
     @Column(name = "origin_label", nullable = false)
     public String originLabel;
 
+    @Column(name = "origin_street")
+    public String originStreet;
+
     @Column(name = "destination_id", nullable = false)
     public Integer destinationId;
 
     @Column(name = "destination_label", nullable = false)
     public String destinationLabel;
+
+    @Column(name = "destination_street")
+    public String destinationStreet;
 
     @Column(nullable = false)
     public Integer weight;

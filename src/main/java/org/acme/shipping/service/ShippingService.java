@@ -52,8 +52,10 @@ public class ShippingService {
         history.userId = userId;
         history.originId = dto.originId();
         history.originLabel = dto.originLabel();
+        history.originStreet = dto.originStreet();
         history.destinationId = dto.destinationId();
         history.destinationLabel = dto.destinationLabel();
+        history.destinationStreet = dto.destinationStreet();
         history.weight = dto.weight();
         history.result = couriers.toString();
         history.persist();
