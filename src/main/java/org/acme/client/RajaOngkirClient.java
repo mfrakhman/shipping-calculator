@@ -45,7 +45,11 @@ public class RajaOngkirClient {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                throw new WebApplicationException("RajaOngkir API error", Response.Status.BAD_GATEWAY);
+                String msg = extractErrorMessage(response.body(), "RajaOngkir API error");
+                Response.Status status = response.statusCode() < 500
+                        ? Response.Status.BAD_REQUEST
+                        : Response.Status.BAD_GATEWAY;
+                throw new WebApplicationException(msg, status);
             }
 
             return mapper.readTree(response.body()).path("data");
@@ -69,7 +73,11 @@ public class RajaOngkirClient {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                throw new WebApplicationException("RajaOngkir API error", Response.Status.BAD_GATEWAY);
+                String msg = extractErrorMessage(response.body(), "RajaOngkir API error");
+                Response.Status status = response.statusCode() < 500
+                        ? Response.Status.BAD_REQUEST
+                        : Response.Status.BAD_GATEWAY;
+                throw new WebApplicationException(msg, status);
             }
 
             return mapper.readTree(response.body()).path("data");
@@ -79,5 +87,14 @@ public class RajaOngkirClient {
             Log.errorf(e, "RajaOngkir call failed: %s", e.getMessage());
             throw new WebApplicationException("Upstream service unavailable", Response.Status.BAD_GATEWAY);
         }
+    }
+
+    private String extractErrorMessage(String body, String fallback) {
+        try {
+            JsonNode root = mapper.readTree(body);
+            JsonNode msg = root.path("meta").path("message");
+            if (!msg.isMissingNode() && !msg.asText().isBlank()) return msg.asText();
+        } catch (Exception ignored) {}
+        return fallback;
     }
 }

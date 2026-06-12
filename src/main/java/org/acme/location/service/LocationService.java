@@ -1,6 +1,7 @@
 package org.acme.location.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.acme.client.RajaOngkirClient;
@@ -18,6 +19,7 @@ public class LocationService {
     @Inject
     RajaOngkirClient client;
 
+    @CacheResult(cacheName = "location-provinces")
     public List<ProvinceDto> getProvinces() {
         JsonNode data = client.get("/destination/province");
         return StreamSupport.stream(data.spliterator(), false)
@@ -27,6 +29,7 @@ public class LocationService {
                 .toList();
     }
 
+    @CacheResult(cacheName = "location-cities")
     public List<CityDto> getCities(String provinceId) {
         JsonNode data = client.get("/destination/city/" + provinceId);
         return StreamSupport.stream(data.spliterator(), false)
@@ -37,6 +40,7 @@ public class LocationService {
                 .toList();
     }
 
+    @CacheResult(cacheName = "location-districts")
     public List<DistrictDto> getDistricts(String cityId) {
         JsonNode data = client.get("/destination/district/" + cityId);
         return StreamSupport.stream(data.spliterator(), false)
@@ -46,6 +50,7 @@ public class LocationService {
                 .toList();
     }
 
+    @CacheResult(cacheName = "location-subdistricts")
     public List<SubdistrictDto> getSubdistricts(String districtId) {
         JsonNode data = client.get("/destination/sub-district/" + districtId);
         return StreamSupport.stream(data.spliterator(), false)
