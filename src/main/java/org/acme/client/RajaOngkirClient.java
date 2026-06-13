@@ -10,10 +10,12 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import jakarta.annotation.PostConstruct;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 @ApplicationScoped
 public class RajaOngkirClient {
@@ -31,7 +33,20 @@ public class RajaOngkirClient {
 
     @PostConstruct
     void init() {
-        this.httpClient = HttpClient.newHttpClient();
+        this.httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+    }
+
+    private HttpResponse<String> sendWithRetry(HttpRequest request) throws IOException, InterruptedException {
+        try {
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            // Stale pooled connection reset by server — retry once on a fresh connection
+            Log.debugf("Retrying request after connection reset: %s", e.getMessage());
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        }
     }
 
     public JsonNode get(String path) {
@@ -42,7 +57,7 @@ public class RajaOngkirClient {
                     .GET()
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = sendWithRetry(request);
 
             if (response.statusCode() != 200) {
                 String msg = extractErrorMessage(response.body(), "RajaOngkir API error");
@@ -70,7 +85,7 @@ public class RajaOngkirClient {
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = sendWithRetry(request);
 
             if (response.statusCode() != 200) {
                 String msg = extractErrorMessage(response.body(), "RajaOngkir API error");
