@@ -16,7 +16,7 @@ import java.time.Instant;
 public class AuthService {
 
     @Transactional
-    public User register(RegisterRequestDto dto) {
+    public String register(RegisterRequestDto dto) {
         if (User.findByEmail(dto.email()).isPresent()) {
             throw new WebApplicationException("Email already registered", Response.Status.CONFLICT);
         }
@@ -28,7 +28,7 @@ public class AuthService {
         user.role = "USER";
         user.persist();
 
-        return user;
+        return generateToken(user);
     }
 
     public String login(LoginRequestDto dto) {

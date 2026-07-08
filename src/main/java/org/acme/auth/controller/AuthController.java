@@ -6,8 +6,9 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.acme.auth.dto.*;
-import org.acme.auth.entity.User;
+import org.acme.auth.dto.AuthResponseDto;
+import org.acme.auth.dto.LoginRequestDto;
+import org.acme.auth.dto.RegisterRequestDto;
 import org.acme.auth.service.AuthService;
 import org.acme.common.response.ApiResponse;
 
@@ -23,10 +24,9 @@ public class AuthController {
     @POST
     @Path("/register")
     public Response register(@Valid RegisterRequestDto dto) {
-        User user = authService.register(dto);
-        var data = new RegisterResponseDto(user.id.toString(), user.email, user.name);
+        String token = authService.register(dto);
         return Response.status(201)
-                .entity(ApiResponse.ok("Registration successful", data))
+                .entity(ApiResponse.ok("Registration successful", new AuthResponseDto(token, 86400)))
                 .build();
     }
 

@@ -1,0 +1,9 @@
+services:
+  logitrack-api:
+    build: .
+    container_name: logitrack_api
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
